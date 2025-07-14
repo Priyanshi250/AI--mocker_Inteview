@@ -19,6 +19,7 @@ export default function AddNewInterview({ open, onClose, onStart }) {
   const [description, setDescription] = useState('');
   const [experience, setExperience] = useState('');
   const [loading, setLoading] = useState(false);
+  const [questions, setQuestions] = useState([]); // <-- Add state for questions
 
   if (!open) return null;
 
@@ -29,6 +30,7 @@ export default function AddNewInterview({ open, onClose, onStart }) {
       try {
         const questions = await fetchInterviewQuestionsFromGemini({ role, description, experience });
         console.log('Gemini Interview Questions:', questions);
+        setQuestions(questions); // <-- Save questions to state
         setRole('');
         setDescription('');
         setExperience('');
