@@ -1,4 +1,9 @@
+import { MockInterview } from '@/utils/schema';
 import React, { useState } from 'react';
+import { db } from '@/utils/db';
+import { v4 as uuidv4 } from 'uuid';
+import { useUser } from '@clerk/nextjs'
+import moment from 'moment';
 
 // Replace this with your real Gemini API endpoint or function
 async function fetchInterviewQuestionsFromGemini({ role, description, experience }) {
@@ -20,6 +25,7 @@ export default function AddNewInterview({ open, onClose, onStart }) {
   const [experience, setExperience] = useState('');
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]); // <-- Add state for questions
+  const { user } = useUser();
 
   if (!open) return null;
 
@@ -29,12 +35,37 @@ export default function AddNewInterview({ open, onClose, onStart }) {
       setLoading(true);
       try {
         const questions = await fetchInterviewQuestionsFromGemini({ role, description, experience });
-        console.log('Gemini Interview Questions:', questions);
-        setQuestions(questions); // <-- Save questions to state
+        setQuestions(questions);
         setRole('');
         setDescription('');
         setExperience('');
         onStart(questions);
+        // Insert into DB if questions generated and valid
+        if (questions && Array.isArray(questions) && questions.length > 0 && questions[0].question) {
+          try {
+            const resp = await db.insert(MockInterview)
+              .values({
+                mockId: uuidv4(),
+                jsonMockResp: JSON.stringify(questions),
+                jobPosition: role,
+                jobDesc: description,
+                jobExperience: experience,
+                createdBy: user?.primaryEmailAddress?.emailAddress || 'unknown',
+                createdAt: moment().format('DD-MM-yyyy')
+              })
+              .returning({ mockId: MockInterview.mockId });
+            console.log('Inserted ID:', resp?.[0]?.mockId || resp);
+          } catch (dbErr) {
+            console.error('DB Insert Error:', dbErr);
+          }
+        } else {
+          alert('No valid questions were generated. Please try again.');
+        }
+
+        if(resp){
+          setOpenDailog(false);
+          Router.push('/dashboard/interview/'+resp[0].mockId)
+        }
       } catch (err) {
         alert('Failed to fetch questions from Gemini AI.');
       } finally {
