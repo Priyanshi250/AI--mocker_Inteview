@@ -1,5 +1,5 @@
 import { db } from '@/utils/db';
-import { MockInterview } from '@/utils/schema';
+import { MockInterview, UserAnswer } from '@/utils/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET(request) {
@@ -17,6 +17,36 @@ export async function GET(request) {
     return new Response(JSON.stringify(result), { status: 200 });
   } catch (err) {
     console.error('Database error in get-mock-interview:', err);
+    return new Response(JSON.stringify({ error: 'Database error', details: String(err) }), { status: 500 });
+  }
+}
+
+// Add POST endpoint to save user answers
+export async function POST(request) {
+  let body;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), { status: 400 });
+  }
+  const { mockIdRef, question, correctAns, userAns, feedback, rating, userEmail } = body || {};
+  if (!mockIdRef || !question || !userAns || !userEmail) {
+    return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
+  }
+  try {
+    const createdAt = new Date().toISOString();
+    const result = await db.insert(UserAnswer).values({
+      mockIdRef,
+      question,
+      correctAns: correctAns || '',
+      userAns,
+      feedback: feedback || '',
+      rating: rating || '',
+      userEmail,
+      createdAt,
+    });
+    return new Response(JSON.stringify({ success: true, result }), { status: 201 });
+  } catch (err) {
     return new Response(JSON.stringify({ error: 'Database error', details: String(err) }), { status: 500 });
   }
 } 

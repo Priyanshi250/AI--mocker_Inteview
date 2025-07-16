@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 
-function RecordAnswerSection() {
+function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
     const videoRef = useRef(null);
     const [stream, setStream] = useState(null);
     const [mediaStatus, setMediaStatus] = useState('idle'); // idle, started, closed, error
@@ -83,6 +83,8 @@ function RecordAnswerSection() {
                 finalTranscript += event.results[i][0].transcript;
             }
             setTranscript(finalTranscript);
+            // Log transcript to console instead of showing on UI
+            console.log('Transcript:', finalTranscript);
         };
         recognition.onerror = (event) => {
             setError('Speech recognition error: ' + event.error);
@@ -90,6 +92,10 @@ function RecordAnswerSection() {
         };
         recognition.onend = () => {
             setIsRecording(false);
+            // Save answer to DB when recording stops
+            if (transcript && typeof onSaveAnswer === 'function') {
+                onSaveAnswer({ userAns: transcript });
+            }
         };
         recognitionRef.current = recognition;
         recognition.start();
@@ -144,11 +150,7 @@ function RecordAnswerSection() {
                     {showCameraWarning && (
                         <div className="mt-2 text-red-400 text-base font-bold">Enable camera before recording answer.</div>
                     )}
-                    {transcript && (
-                        <div className="mt-6 w-full bg-black/70 rounded-lg p-4 border border-red-700 text-white text-lg">
-                            <span className="font-bold text-red-400">Transcript:</span> {transcript}
-                        </div>
-                    )}
+                    {/* Removed transcript display from UI */}
                 </div>
             </div>
         </div>
