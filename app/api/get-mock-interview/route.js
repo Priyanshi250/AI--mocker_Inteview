@@ -27,11 +27,14 @@ export async function POST(request) {
   try {
     body = await request.json();
   } catch (e) {
-    return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), { status: 400 });
+    console.error('Invalid JSON in request body:', e);
+    return new Response(JSON.stringify({ error: 'Invalid JSON in request body', details: String(e) }), { status: 400 });
   }
   const { mockIdRef, question, correctAns, userAns, feedback, rating, userEmail } = body || {};
+  console.log('POST /api/get-mock-interview payload:', body);
   if (!mockIdRef || !question || !userAns || !userEmail) {
-    return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
+    console.error('Missing required fields:', { mockIdRef, question, userAns, userEmail });
+    return new Response(JSON.stringify({ error: 'Missing required fields', details: { mockIdRef, question, userAns, userEmail } }), { status: 400 });
   }
   try {
     const createdAt = new Date().toISOString();
@@ -47,6 +50,7 @@ export async function POST(request) {
     });
     return new Response(JSON.stringify({ success: true, result }), { status: 201 });
   } catch (err) {
+    console.error('Database error in POST /api/get-mock-interview:', err);
     return new Response(JSON.stringify({ error: 'Database error', details: String(err) }), { status: 500 });
   }
 } 

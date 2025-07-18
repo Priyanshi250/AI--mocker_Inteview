@@ -1,17 +1,8 @@
 "use client";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export default function ClerkProviderWithFonts({ children }) {
   return (
@@ -22,7 +13,7 @@ export default function ClerkProviderWithFonts({ children }) {
         },
       }}
     >
-      <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <div className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         {children}
       </div>
     </ClerkProvider>

@@ -1,11 +1,13 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import QuestionSection from "./_components/QuestionSection"
 import RecordAnswerSection from "./_components/RecordAnswerSection"
 import { useUser } from '@clerk/nextjs';
+import { toast, Toaster } from 'react-hot-toast';
 
 function StartInterview() {
+    const router = useRouter();
     const params = useParams();
     const interviewId = params?.interviewId;
     const [questions, setQuestions] = useState([]);
@@ -54,11 +56,20 @@ function StartInterview() {
             rating,
             userEmail: user?.primaryEmailAddress?.emailAddress || 'unknown',
         };
-        await fetch('/api/get-mock-interview', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
+        try {
+            const res = await fetch('/api/get-mock-interview', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            if (res.ok) {
+                toast.success('Answer saved!');
+            } else {
+                toast.error('Failed to save answer.');
+            }
+        } catch (err) {
+            toast.error('Failed to save answer.');
+        }
     };
 
     if (loading) return <div className="text-white text-xl p-8">Loading questions...</div>;
@@ -67,6 +78,7 @@ function StartInterview() {
 
     return (
         <div className="flex flex-row w-full min-h-screen bg-black">
+            <Toaster position="top-right" />
             {/* Left: Questions */}
             <div className="w-full md:w-1/2 p-6 flex flex-col justify-start items-start bg-gradient-to-b from-black via-gray-900 to-red-900 border-r border-red-900/40 min-h-screen">
                 <QuestionSection questions={questions} selected={selected} setSelected={setSelected} />
@@ -89,7 +101,7 @@ function StartInterview() {
                     {selected === questions.length - 1 && (
                         <button
                             className="px-6 py-2 rounded-lg bg-red-700 text-white font-bold shadow hover:bg-red-800"
-                            onClick={() => alert('Interview Ended! (Implement summary/redirect logic here)')}
+                            onClick={() => router.push(`/dashboard/interview/${interviewId}/feedback`)}
                         >
                             End Interview
                         </button>

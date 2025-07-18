@@ -1,6 +1,7 @@
 
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
 function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
     const videoRef = useRef(null);
@@ -9,8 +10,24 @@ function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
     const [error, setError] = useState('');
     const [isRecording, setIsRecording] = useState(false);
     const [transcript, setTranscript] = useState('');
+    const transcriptRef = useRef('');
     const recognitionRef = useRef(null);
     const [showCameraWarning, setShowCameraWarning] = useState(false);
+    const [feedback, setFeedback] = useState('');
+    const [rating, setRating] = useState('');
+    const [loadingFeedback, setLoadingFeedback] = useState(false);
+
+    // Keep transcriptRef in sync with transcript
+    useEffect(() => {
+        transcriptRef.current = transcript;
+    }, [transcript]);
+
+    // Clear feedback/rating/transcript when question changes
+    useEffect(() => {
+        setTranscript('');
+        setFeedback('');
+        setRating('');
+    }, [question]);
 
     const handleStartMedia = async () => {
         try {
@@ -43,6 +60,50 @@ function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
         };
     }, [stream]);
 
+    // Helper to get feedback and rating from Gemini API
+    const fetchFeedbackAndRating = async (question, correctAns, userAns) => {
+        setLoadingFeedback(true);
+        setFeedback('');
+        setRating('');
+        try {
+            const prompt = `Question: ${question}\nCorrect Answer: ${correctAns}\nUser Answer: ${userAns}\nBased on the question and user answer, please give a rating (out of 10) and feedback (3-5 lines, area of improvement if any) in JSON format with 'rating' and 'feedback' fields only.`;
+            // Use a proxy API route to avoid direct Gemini API call from client
+            const response = await fetch('/api/gemini-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+            const data = await response.json();
+            console.log('Gemini API response:', data);
+            let json = data;
+            if (typeof data === 'string') {
+                try {
+                    json = JSON.parse(data);
+                } catch (e) {
+                    json = { rating: '', feedback: 'Could not parse feedback.' };
+                }
+            }
+            setFeedback(json.feedback || '');
+            setRating(json.rating || '');
+            // Log all details together for clarity
+            console.log('--- Interview Feedback ---');
+            console.log('Question:', question);
+            console.log('Correct Answer:', correctAns);
+            console.log('User Answer:', userAns);
+            console.log('Rating:', json.rating);
+            console.log('Feedback:', json.feedback);
+            console.log('--------------------------');
+            return json;
+        } catch (err) {
+            setFeedback('Failed to get feedback.');
+            setRating('');
+            console.error('Error fetching feedback:', err);
+            return { rating: '', feedback: 'Failed to get feedback.' };
+        } finally {
+            setLoadingFeedback(false);
+        }
+    };
+
     // Speech-to-text logic
     const handleRecordAnswer = async () => {
         if (mediaStatus !== 'started') {
@@ -56,6 +117,8 @@ function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
             if (recognitionRef.current) {
                 recognitionRef.current.stop();
             }
+            // Show toast when user stops recording
+            toast.success('Your answer recorded successfully!');
             return;
         }
         // Request mic permission
@@ -72,6 +135,7 @@ function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
             return;
         }
         setTranscript('');
+        transcriptRef.current = '';
         setIsRecording(true);
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
@@ -83,19 +147,18 @@ function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
                 finalTranscript += event.results[i][0].transcript;
             }
             setTranscript(finalTranscript);
-            // Log transcript to console instead of showing on UI
+            transcriptRef.current = finalTranscript;
             console.log('Transcript:', finalTranscript);
         };
         recognition.onerror = (event) => {
             setError('Speech recognition error: ' + event.error);
             setIsRecording(false);
         };
-        recognition.onend = () => {
+        recognition.onend = async () => {
             setIsRecording(false);
-            // Save answer to DB when recording stops
-            if (transcript && typeof onSaveAnswer === 'function') {
-                onSaveAnswer({ userAns: transcript });
-            }
+            // Get feedback and rating from Gemini
+            const result = await fetchFeedbackAndRating(question, correctAns, transcriptRef.current);
+            onSaveAnswer({ userAns: transcriptRef.current, rating: result.rating, feedback: result.feedback });
         };
         recognitionRef.current = recognition;
         recognition.start();
@@ -142,7 +205,7 @@ function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
                     <button
                         onClick={handleRecordAnswer}
                         className={`px-8 py-4 bg-gradient-to-r from-red-600 via-red-500 to-red-700 text-white text-xl font-extrabold rounded-xl shadow-lg hover:from-red-700 hover:to-red-800 focus:ring-2 focus:ring-red-400 focus:outline-none transition-all duration-200 ${isRecording ? 'animate-pulse' : ''}`}
-                        disabled={mediaStatus !== 'started'}
+                        disabled={mediaStatus !== 'started' || loadingFeedback}
                         title={mediaStatus !== 'started' ? 'Enable camera to record answer' : ''}
                     >
                         {isRecording ? 'Stop Recording' : 'Record Answer'}
@@ -150,8 +213,19 @@ function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
                     {showCameraWarning && (
                         <div className="mt-2 text-red-400 text-base font-bold">Enable camera before recording answer.</div>
                     )}
-                    {/* Removed transcript display from UI */}
+                    {loadingFeedback && (
+                        <div className="mt-2 text-yellow-300 text-base font-bold">Getting feedback...</div>
+                    )}
                 </div>
+                {/* Feedback and Rating Display */}
+                {(feedback || rating) && (
+                    <div className="mt-6 w-full max-w-xl bg-yellow-100/10 border-l-4 border-yellow-400 p-6 rounded-lg shadow text-yellow-200 text-base font-semibold">
+                        <span className="block mb-2 text-yellow-300 font-bold">Feedback:</span>
+                        <div className="mb-2">{feedback}</div>
+                        <span className="block mb-2 text-yellow-300 font-bold">Rating:</span>
+                        <div>{rating}</div>
+                    </div>
+                )}
             </div>
         </div>
     );
