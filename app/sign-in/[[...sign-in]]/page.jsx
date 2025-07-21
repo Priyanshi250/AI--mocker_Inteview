@@ -24,9 +24,9 @@ export default function SignInPage() {
       <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-r from-yellow-400 to-red-600 rounded-full blur-2xl opacity-30 animate-spin"></div>
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-lg">
-          {/* Hero Section */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-start p-4">
+        {/* Hero Section (AI Interview MOCKER heading as usual) */}
+        <div className="w-full max-w-lg mt-8">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
               <div className="relative">
@@ -54,25 +54,24 @@ export default function SignInPage() {
               Get real-time feedback, personalized questions, and ace your next interview!
             </p>
           </div>
-
-          {/* Sign In Card */}
-          <div className="bg-black/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-red-900/40 p-8 relative overflow-hidden">
+        </div>
+        {/* Full Screen Sign In Card */}
+        <div className="flex-1 w-full flex items-center justify-center">
+          <div className="w-full max-w-lg bg-black/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-red-900/40 p-10 relative overflow-hidden flex flex-col items-center justify-center min-h-[400px]">
             {/* Card Background Pattern */}
             <div className="absolute inset-0 bg-gradient-to-br from-black/40 to-red-900/20 rounded-3xl"></div>
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-700/30 to-black/30 rounded-full blur-2xl"></div>
-            
-            <div className="relative z-10">
-              <div className="text-center mb-8">
+            <div className="relative z-10 w-full flex flex-col items-center justify-center">
+              <div className="text-center mb-8 w-full">
                 <h2 className="text-3xl font-bold text-white mb-3 drop-shadow">
-                  Welcome Back! 👋
+                  Welcome Back!
                 </h2>
                 <p className="text-white/80 text-lg drop-shadow">
                   Ready to crush your next interview?
                 </p>
               </div>
-
               {/* Enhanced Clerk SignIn Component */}
-              <div className="clerk-signin-wrapper">
+              <div className="clerk-signin-wrapper w-full">
                 <SignIn 
                   redirectUrl="/dashboard"
                   appearance={{
@@ -110,66 +109,62 @@ export default function SignInPage() {
                   }}
                 />
               </div>
-
-              {/* Features Showcase */}
-              <div className="mt-10 pt-8 border-t border-red-900/30">
-                <h3 className="text-xl font-bold text-white mb-6 text-center drop-shadow">
-                  ✨ What You'll Get
-                </h3>
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="flex items-center p-4 bg-black/30 rounded-2xl border border-red-900/30 backdrop-blur-sm hover:bg-red-900/10 transition-all duration-300">
-                    <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-black rounded-xl flex items-center justify-center mr-4 shadow-lg">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h4 className="text-white font-semibold text-lg drop-shadow">AI-Powered Mock Interviews</h4>
-                      <p className="text-white/70 text-sm drop-shadow">Practice with intelligent AI that adapts to your responses</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center p-4 bg-black/30 rounded-2xl border border-red-900/30 backdrop-blur-sm hover:bg-red-900/10 transition-all duration-300">
-                    <div className="w-12 h-12 bg-gradient-to-r from-red-600 to-black rounded-xl flex items-center justify-center mr-4 shadow-lg">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h4 className="text-white font-semibold text-lg drop-shadow">Real-Time Analytics</h4>
-                      <p className="text-white/70 text-sm drop-shadow">Get instant feedback and performance insights</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center p-4 bg-black/30 rounded-2xl border border-red-900/30 backdrop-blur-sm hover:bg-red-900/10 transition-all duration-300">
-                    <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-red-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h4 className="text-white font-semibold text-lg drop-shadow">Personalized Questions</h4>
-                      <p className="text-white/70 text-sm drop-shadow">Questions tailored to your industry and experience level</p>
-                    </div>
-                  </div>
-                </div>
+            </div>
+          </div>
+        </div>
+        {/* Features Showcase */}
+        <div className="w-full max-w-lg mt-10">
+          <h3 className="text-xl font-bold text-white mb-6 text-center drop-shadow">
+            ✨ What You'll Get
+          </h3>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex items-center p-4 bg-black/30 rounded-2xl border border-red-900/30 backdrop-blur-sm hover:bg-red-900/10 transition-all duration-300">
+              <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-black rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg drop-shadow">AI-Powered Mock Interviews</h4>
+                <p className="text-white/70 text-sm drop-shadow">Practice with intelligent AI that adapts to your responses</p>
+              </div>
+            </div>
+            <div className="flex items-center p-4 bg-black/30 rounded-2xl border border-red-900/30 backdrop-blur-sm hover:bg-red-900/10 transition-all duration-300">
+              <div className="w-12 h-12 bg-gradient-to-r from-red-600 to-black rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg drop-shadow">Real-Time Analytics</h4>
+                <p className="text-white/70 text-sm drop-shadow">Get instant feedback and performance insights</p>
+              </div>
+            </div>
+            <div className="flex items-center p-4 bg-black/30 rounded-2xl border border-red-900/30 backdrop-blur-sm hover:bg-red-900/10 transition-all duration-300">
+              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-red-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg drop-shadow">Personalized Questions</h4>
+                <p className="text-white/70 text-sm drop-shadow">Questions tailored to your industry and experience level</p>
               </div>
             </div>
           </div>
-
-          {/* Footer */}
-          <div className="text-center mt-8">
-            <p className="text-white/60 text-sm drop-shadow">
-              By signing in, you agree to our{" "}
-              <a href="#" className="text-red-300 hover:text-red-200 font-semibold transition-colors duration-200">
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a href="#" className="text-red-300 hover:text-red-200 font-semibold transition-colors duration-200">
-                Privacy Policy
-              </a>
-            </p>
-          </div>
+        </div>
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-white/60 text-sm drop-shadow">
+            By signing in, you agree to our{" "}
+            <a href="#" className="text-red-300 hover:text-red-200 font-semibold transition-colors duration-200">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-red-300 hover:text-red-200 font-semibold transition-colors duration-200">
+              Privacy Policy
+            </a>
+          </p>
         </div>
       </div>
     </div>

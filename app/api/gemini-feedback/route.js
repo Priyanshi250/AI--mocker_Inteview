@@ -6,7 +6,8 @@ export async function POST(request) {
     }
     const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'Gemini API key not set.' }), { status: 500 });
+      // Always return a valid JSON structure for the frontend
+      return new Response(JSON.stringify({ rating: '', feedback: 'Gemini API key not set on server.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
     const geminiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
@@ -26,8 +27,15 @@ export async function POST(request) {
     let json;
     try {
       json = JSON.parse(text);
+      // Enforce rating is a number between 0 and 10
+      let ratingNum = Number(json.rating);
+      if (isNaN(ratingNum) || ratingNum < 0) ratingNum = 0;
+      if (ratingNum > 10) ratingNum = 10;
+      json.rating = ratingNum.toString();
     } catch (e) {
-      json = { rating: '', feedback: 'Could not parse feedback.' };
+      // Log the raw Gemini response for debugging
+      console.error('Failed to parse Gemini response:', text);
+      json = { rating: '0', feedback: 'Could not parse feedback from Gemini.' };
     }
     return new Response(JSON.stringify(json), {
       status: 200,

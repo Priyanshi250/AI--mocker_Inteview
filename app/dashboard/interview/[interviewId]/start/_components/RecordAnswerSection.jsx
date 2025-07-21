@@ -218,14 +218,14 @@ function RecordAnswerSection({ question, correctAns, onSaveAnswer }) {
                     )}
                 </div>
                 {/* Feedback and Rating Display */}
-                {(feedback || rating) && (
+                {/* (feedback || rating) && (
                     <div className="mt-6 w-full max-w-xl bg-yellow-100/10 border-l-4 border-yellow-400 p-6 rounded-lg shadow text-yellow-200 text-base font-semibold">
                         <span className="block mb-2 text-yellow-300 font-bold">Feedback:</span>
                         <div className="mb-2">{feedback}</div>
                         <span className="block mb-2 text-yellow-300 font-bold">Rating:</span>
                         <div>{rating}</div>
                     </div>
-                )}
+                ) */}
             </div>
         </div>
     );

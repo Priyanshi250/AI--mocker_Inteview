@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import AddNewInterview from "./_components/AddNewInterview";
+import InterviewList from "./_components/InterviewList";
 
 export default function DashBoard() {
   const { isLoaded } = useAuth();
@@ -42,12 +43,13 @@ export default function DashBoard() {
       <AddNewInterview
         open={showModal}
         onClose={() => setShowModal(false)}
-        onStart={questions => {
+        onStart={() => {
           setShowModal(false);
-          setQuestions(questions);
         }}
       />
+      <InterviewList />
       {/* Show questions if available */}
+      {/*
       {questions.length > 0 && (
         <div className="bg-black/60 border border-red-900/30 rounded-xl shadow p-6 mt-6">
           <h2 className="text-2xl font-bold text-white mb-4">Interview Questions</h2>
@@ -61,6 +63,7 @@ export default function DashBoard() {
           </ul>
         </div>
       )}
+      */}
     </div>
   );
 }

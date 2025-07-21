@@ -74,9 +74,9 @@ function FeedbackPage({ params }) {
     };
 
     return (
-        <div className="max-w-6xl mx-auto mt-12 flex flex-col md:flex-row gap-8">
-            {/* Left: Feedback summary and questions */}
-            <div className="flex-1 p-8 rounded-xl shadow-lg bg-gradient-to-br from-red-700 via-black to-red-900 border border-red-900/60">
+        <div className="w-full min-h-screen mt-12 flex flex-col md:flex-row gap-8 items-stretch justify-center px-2">
+            {/* Feedback summary and questions: 75% width on desktop */}
+            <div className="w-full md:w-3/4 p-8 rounded-xl shadow-lg bg-gradient-to-br from-red-700 via-black to-red-900 border border-red-900/60 mb-8 md:mb-0 flex flex-col">
                 <h1 className="text-4xl font-bold text-center text-white mb-4 drop-shadow-lg">Congratulations!</h1>
                 <h2 className="text-2xl font-semibold text-center mb-6 text-red-200">Here is your Interview Feedback</h2>
                 {averageRating && (
@@ -108,8 +108,8 @@ function FeedbackPage({ params }) {
                     ))}
                 </div>
             </div>
-            {/* Right: Pie chart */}
-            <div className="w-full md:w-96 flex flex-col items-center justify-center bg-black/70 rounded-xl shadow-lg border border-red-900/60 p-6">
+            {/* Pie chart: 25% width on desktop, full width on mobile */}
+            <div className="w-full md:w-1/4 flex flex-col items-start justify-start bg-black/70 rounded-xl shadow-lg border border-red-900/60 p-6">
                 <h3 className="text-2xl font-bold text-white mb-6">Performance Chart</h3>
                 <Pie data={pieData} />
                 <div className="mt-4 text-white/80 text-center text-sm">

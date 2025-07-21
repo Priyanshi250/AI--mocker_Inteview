@@ -18,7 +18,7 @@ export async function POST(request) {
     console.error('Invalid JSON in request body');
     return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' }
     });
   }
   const { role, description, experience } = body || {};
@@ -69,6 +69,7 @@ export async function POST(request) {
       let text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
       text = text.replace(/```json|```/g, '').trim();
       questions = JSON.parse(text);
+      if (!Array.isArray(questions)) questions = [];
     } catch (e) {
       console.error('Failed to parse Gemini response as JSON:', e);
       questions = [];

@@ -8,14 +8,32 @@ function Interview() {
   const [mediaStatus, setMediaStatus] = useState('idle') // idle, started, closed, error
   const [error, setError] = useState('')
   const [interviewStarted, setInterviewStarted] = useState(false)
+  const [jobInfo, setJobInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState('');
   const router = useRouter()
   const params = useParams()
   const interviewId = params?.interviewId
 
-  // Placeholder job info (replace with real data as needed)
-  const jobRole = "Frontend Developer";
-  const jobDescription = "React, Node.js, REST APIs";
-  const jobExperience = "2 years";
+  useEffect(() => {
+    if (!interviewId) return;
+    setLoading(true);
+    setFetchError('');
+    fetch(`/api/get-mock-interview?mockId=${interviewId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && !data.error) {
+          setJobInfo(data);
+        } else {
+          setFetchError(data.error || 'Not found');
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        setFetchError('Failed to fetch job info');
+        setLoading(false);
+      });
+  }, [interviewId]);
 
   const handleStartMedia = async () => {
     try {
@@ -64,9 +82,17 @@ function Interview() {
       <div className="w-1/3 flex flex-col justify-center items-center bg-gradient-to-b from-black via-gray-900 to-red-900 border-r border-red-900/40 h-full p-6">
         <div className="w-full max-w-xs">
           <h2 className="text-3xl font-extrabold text-white mb-4 text-center">Job Information</h2>
-          <div className="text-red-200 mb-2 text-lg break-words"><span className="font-bold text-white">Role:</span> {jobRole}</div>
-          <div className="text-red-200 mb-2 text-lg break-words"><span className="font-bold text-white">Description:</span> {jobDescription}</div>
-          <div className="text-red-200 text-lg break-words"><span className="font-bold text-white">Experience:</span> {jobExperience}</div>
+          {loading ? (
+            <div className="text-red-200 text-lg">Loading...</div>
+          ) : fetchError ? (
+            <div className="text-red-400 text-lg">{fetchError}</div>
+          ) : jobInfo ? (
+            <>
+              <div className="text-red-200 mb-2 text-lg break-words"><span className="font-bold text-white">Role:</span> {jobInfo.jobPosition}</div>
+              <div className="text-red-200 mb-2 text-lg break-words"><span className="font-bold text-white">Description:</span> {jobInfo.jobDesc}</div>
+              <div className="text-red-200 text-lg break-words"><span className="font-bold text-white">Experience:</span> {jobInfo.jobExperience} years</div>
+            </>
+          ) : null}
         </div>
         <div className="bg-black/70 border border-red-700 rounded-lg p-5 text-white text-lg mt-6 max-w-xs w-full text-center">
           <h3 className="font-extrabold text-red-400 mb-2 text-xl">Interview Instructions</h3>

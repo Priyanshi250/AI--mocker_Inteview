@@ -35,15 +35,15 @@ export default function AddNewInterview({ open, onClose, onStart }) {
       setLoading(true);
       try {
         const questions = await fetchInterviewQuestionsFromGemini({ role, description, experience });
-        setQuestions(questions);
+        // Remove setQuestions(questions);
         setRole('');
         setDescription('');
         setExperience('');
-        onStart(questions);
         // Insert into DB if questions generated and valid
+        let resp = null;
         if (questions && Array.isArray(questions) && questions.length > 0 && questions[0].question) {
           try {
-            const resp = await db.insert(MockInterview)
+            resp = await db.insert(MockInterview)
               .values({
                 mockId: uuidv4(),
                 jsonMockResp: JSON.stringify(questions),
@@ -62,9 +62,9 @@ export default function AddNewInterview({ open, onClose, onStart }) {
           alert('No valid questions were generated. Please try again.');
         }
 
-        if(resp){
-          setOpenDailog(false);
-          Router.push('/dashboard/interview/'+resp[0].mockId)
+        if(resp && resp[0]?.mockId){
+          onClose && onClose();
+          window.location.href = '/dashboard/interview/' + resp[0].mockId;
         }
       } catch (err) {
         alert('Failed to fetch questions from Gemini AI.');
